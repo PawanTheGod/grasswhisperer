@@ -1,111 +1,92 @@
-# 🌿 GrassWhisperer
+# 🌿 GrassWhisperer v2.0
 
-> **Hacktoberfest 2024 · Challenge 1: Touch Grass**  
-> Local AI outdoor companion — 100% open-source, runs on your laptop, no internet needed.
+> **Hacktoberfest 2026 · Challenge 1: Touch Grass**  
+> Complete Offline AI Outdoor Companion — 100% open-source, runs on your laptop, zero cloud, zero tracking.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-emerald.svg)](LICENSE)
+[![AI Engine: Ollama](https://img.shields.io/badge/AI%20Engine-Ollama%20(Open--Source)-green.svg)](https://ollama.com)
+[![Weights: Open Weights](https://img.shields.io/badge/Weights-Meta%20Llama%203.2-blue.svg)](https://huggingface.co/meta-llama)
+[![Privacy: Zero Telemetry](https://img.shields.io/badge/Privacy-100%25%20Air--Gapped-brightgreen.svg)](#why-open-innovation-matters)
 
 ---
 
-## What It Does
+## 🌟 What It Does
 
-GrassWhisperer is a **local-first AI app** that helps you get off the screen and into the world:
+GrassWhisperer is an offline-first naturalist operating system designed to get people off their screens and into the wild. Built around open-weight models running on Ollama, it provides 6 specialized field tools:
 
 | Feature | Description |
 |---|---|
-| 🐦 **Bird Whisperer** | Describe what you see or hear — get an instant ID with field tips |
-| 🌱 **Garden Oracle** | Enter your city/zone, get a personalized weekly planting calendar |
-| 🥾 **Trail Finder** | Find the best hike near you for the season (fall foliage, wildflowers, etc.) |
-| 🤔 **Ask Nature** | Free-form Q&A — foraging, stargazing, wildlife tracking, gear |
+| 🐦 **Bird Whisperer** | Describe plumage, behavior, or song phonetics (`"swee-swee-chur"`) — identifies species with field tips and synthetic audio playback |
+| 🍄 **Plant Spotter** | Botanical key analysis with rigorous safety warnings, edible versus toxic classifications, and lethal look-alike alerts |
+| 🌱 **Garden Oracle** | Regional horticultural calendar, USDA hardiness zone awareness, frost timelines, and interactive weekly checklists |
+| 🥾 **Trail Finder** | Custom route profiles by difficulty, distance, and elevation gain with pack checklists and Leave-No-Trace principles |
+| 🌤️ **Outdoor Timing** | Identifies optimal daylight windows (Golden Hour, dawn chorus), celestial sky events, and 10-minute micro-challenges |
+| 🤔 **Ask Nature** | Conversational wilderness expert for navigation, tracking spoor, barometric cloud reading, and survival skills |
 
-## Why Open Source Matters Here
-
-This runs **entirely on your laptop using [Ollama](https://ollama.com) + llama3.2:1b** — a tiny open-weight model that fits in under 1GB of RAM.
-
-- ✅ **Works offline on the trail** — no cell signal needed
-- ✅ **Your data never leaves your device** — no API keys, no telemetry, no accounts
-- ✅ **Swap models freely** — change `MODEL` in `server.js` to any Ollama model
-- ✅ **Costs nothing to run** — no per-query fees, ever
-- ✅ **Fine-tune it** — swap to a domain-specific model like a bird-focused GGUF anytime
-- ✅ **Runs on cheap hardware** — tested on a 4-year-old laptop with 8GB RAM
-
-A closed alternative (GPT-4o, Gemini, Claude) would charge per query, require an internet connection, log your data, and lock you into one provider. Open-source wins here in every dimension that matters for an outdoor tool.
+### 🚀 Additional Product Capabilities
+- 📖 **Offline Field Journal**: Bookmark any observation to `localStorage`; export the full journal as clean Markdown for field notebooks.
+- 📍 **One-Click Location Sync**: Auto-detects coordinates and region to prime weather and phenology queries.
+- 🔊 **Synthesized Field Audio**: Leverages browser Web Speech API to vocalize bird calls phonetically and read field tips aloud on the trail.
+- ⚙️ **Hot Model Switching**: Seamlessly switch between `llama3.2:1b`, `llama3.2:3b`, `mistral`, and `phi3` straight from the UI.
 
 ---
 
-## Quick Start
+## 🛡️ Why Open Innovation Matters Here
 
-### 1. Install Ollama
-Download from [ollama.com](https://ollama.com) and install it.
+GrassWhisperer is fundamentally built around open-source AI:
 
-### 2. Start Ollama and pull the model
+1. **True Backcountry Offline Utility**: Nature doesn't have 5G bars. When you're 8 miles into a mountain trail with zero signal, closed-cloud APIs (OpenAI, Anthropic, Google) are completely useless. Ollama + Llama 3.2 runs on your laptop battery with airplane mode turned on.
+2. **Total Privacy & Zero Data Harvesting**: Your personal garden location, coordinates, foraging spots, and queries are never logged, mined, or sold. Everything stays on `localhost`.
+3. **Zero Operating Cost**: Free forever. No API credit tokens, monthly subscriptions, rate limits, or surprise bills.
+4. **Model Freedom & Portability**: You are never vendor locked. Swap weights at will — run Meta Llama 3.2, Mistral, Microsoft Phi-3, or custom fine-tuned wildlife GGUF weights.
+5. **Transparency & Hackability**: Pure open code. Inspect every system prompt, tweak horticultural logic, and contribute improvements directly.
+
+---
+
+## ⚡ Quick Start
+
+### 1. Install & Launch Ollama
+Download Ollama from [ollama.com](https://ollama.com):
+
 ```bash
-ollama serve          # starts the local AI server
-ollama pull llama3.2:1b   # ~700MB download, one time only
+ollama serve
+ollama pull llama3.2:1b    # ~700MB, lightning fast on laptops
 ```
 
-### 3. Clone and run GrassWhisperer
+*(Optional: For higher reasoning, run `ollama pull llama3.2:3b`)*
+
+### 2. Run GrassWhisperer
 ```bash
-cd challenge-1-touch-grass
+git clone https://github.com/PawanTheGod/grasswhisperer.git
+cd grasswhisperer
 npm install
 npm start
 ```
 
-Then open **http://localhost:3333** 🌿
+Open **http://localhost:3333** 🌿
 
-### Optional: Auto-setup
-```bash
-npm run setup   # checks Ollama + pulls model automatically
+---
+
+## 📐 Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Client Interface                       │
+│  Vanilla HTML5 + Modern CSS + Web Speech API + Geolocation  │
+└──────────────────────────────▲──────────────────────────────┘
+                               │ HTTP / JSON
+┌──────────────────────────────▼──────────────────────────────┐
+│                  Express Node.js Server                     │
+│    localhost:3333 · Prompt Orchestration & JSON Parsing     │
+└──────────────────────────────▲──────────────────────────────┘
+                               │ Loopback Port 11434
+┌──────────────────────────────▼──────────────────────────────┐
+│                    Ollama Runtime Daemon                    │
+│      llama3.2:1b / llama3.2:3b / mistral (Open Weights)     │
+└─────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## Tech Stack
-
-| Layer | Technology | Why open? |
-|---|---|---|
-| AI Runtime | [Ollama](https://ollama.com) | MIT license, runs locally |
-| Model | llama3.2:1b (Meta) | Open weights, commercially usable |
-| Server | Node.js + Express | Zero-dependency, trivial to run |
-| Frontend | Vanilla HTML/CSS/JS | No build step, works everywhere |
-| Fonts | Google Fonts (Outfit, Fraunces) | Free and open |
-
----
-
-## How It Works
-
-```
-Browser → Express (localhost:3333) → Ollama API (localhost:11434) → llama3.2:1b
-                                          ↑
-                              Runs entirely on your machine
-```
-
-Each feature sends a carefully crafted system prompt to Ollama and parses the structured JSON response back into a beautiful UI. No internet connection is made after setup.
-
----
-
-## Customization
-
-**Change the model** (in `server.js`):
-```js
-const MODEL = 'llama3.2:3b';   // larger, smarter
-const MODEL = 'phi3:mini';      // Microsoft's tiny model
-const MODEL = 'mistral';        // great for instructions
-```
-
-**Try these models for better quality:**
-```bash
-ollama pull llama3.2:3b    # better quality, ~2GB
-ollama pull phi3:mini      # very fast
-ollama pull mistral        # excellent reasoning
-```
-
----
-
-## Hacktoberfest Submission
-
-**Open innovation matters here because:**
-
-> A bird ID app that needs the cloud to work doesn't work when you need it most — in the middle of the woods with no signal. GrassWhisperer runs on your phone's hotspot data budget: zero. The open weights, open runtime, and open code mean you own this tool. Swap the model. Fine-tune it on your local bird list. Run it on a $35 Raspberry Pi at your trail head. This is what open-source AI unlocks that GPT-4o never will.
-
----
-
-*Made with 🌿 for Hacktoberfest 2024*
+## 📜 License
+MIT License. Built with ❤️ for Hacktoberfest 2026.

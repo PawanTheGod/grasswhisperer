@@ -3,237 +3,549 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GrassWhisperer 🌿 — Local AI Outdoor Companion</title>
-  <meta name="description" content="Your offline-first AI companion for birding, gardening, hiking, and getting outside. Powered by open-source Ollama — no cloud, no tracking." />
+  <title>GrassWhisperer 🌿 — The Local-First Outdoor Companion</title>
+  <meta name="description" content="100% offline-ready AI field guide for hikers, birders, foragers, and gardeners. Powered by Ollama open weights — zero cloud, zero surveillance." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Ambient background particles -->
-  <div class="ambient" id="ambient"></div>
+  <!-- Ambient backdrop canvas -->
+  <div class="ambient-glow" aria-hidden="true"></div>
 
-  <!-- Status bar -->
-  <div class="status-bar" id="statusBar">
-    <div class="status-dot" id="statusDot"></div>
-    <span id="statusText">Connecting to Ollama...</span>
-    <span class="status-badge">100% Local · No Cloud</span>
-  </div>
+  <!-- Top System Bar -->
+  <aside class="system-bar" role="region" aria-label="System status">
+    <div class="system-bar-inner">
+      <div class="status-indicator">
+        <span class="status-pulse" id="statusDot"></span>
+        <span class="status-label" id="statusText">Checking local AI node…</span>
+      </div>
+      <div class="system-actions">
+        <span class="privacy-badge">🔒 100% On-Device · Zero Telemetry</span>
+        <button class="sys-btn" id="btnLocation" title="Auto-detect current location" onclick="detectLocation()">
+          <span class="sys-btn-icon">📍</span> <span id="locLabel">Detect Location</span>
+        </button>
+        <button class="sys-btn" id="btnJournal" title="Open Field Journal" onclick="toggleJournal()">
+          <span class="sys-btn-icon">📖</span> Journal (<span id="journalCount">0</span>)
+        </button>
+        <button class="sys-btn" id="btnSettings" title="Configure Local Engine" onclick="toggleSettings()">
+          <span class="sys-btn-icon">⚙️</span> Settings
+        </button>
+      </div>
+    </div>
+  </aside>
 
-  <!-- Hero -->
-  <header class="hero">
-    <div class="hero-inner">
-      <div class="logo-wrap">
-        <div class="logo-icon">🌿</div>
-        <div>
-          <h1 class="logo-title">GrassWhisperer</h1>
-          <p class="logo-sub">Open-source AI · Runs on your laptop · No internet needed</p>
+  <!-- Hero Header -->
+  <header class="app-hero">
+    <div class="hero-container">
+      <div class="hero-badge">
+        <span class="sparkle">✦</span> Hacktoberfest 2026 : Touch Grass Edition
+      </div>
+      <div class="hero-brand">
+        <div class="brand-emblem">🌿</div>
+        <div class="brand-text">
+          <h1 class="brand-title">GrassWhisperer</h1>
+          <p class="brand-subtitle">Your offline AI field naturalist · Runs on open-weight LLMs with zero cloud dependency</p>
         </div>
       </div>
-      <p class="hero-tagline">
-        Your trail-ready AI companion — identify birds, plan your garden, find the perfect hike.<br />
-        <em>Powered by <a href="https://ollama.com" target="_blank">Ollama</a> + llama3.2 — your data never leaves your device.</em>
-      </p>
-      <div class="hero-pills">
-        <span class="pill" onclick="showTab('bird')">🐦 Bird ID</span>
-        <span class="pill" onclick="showTab('garden')">🌱 Garden</span>
-        <span class="pill" onclick="showTab('trail')">🥾 Trails</span>
-        <span class="pill" onclick="showTab('ask')">🤔 Ask Nature</span>
-      </div>
+
+      <!-- Feature Navigation Hub -->
+      <nav class="feature-nav" aria-label="Feature navigation">
+        <button class="nav-tab active" data-tab="bird" onclick="switchTab('bird')">
+          <span class="nav-icon">🐦</span>
+          <span class="nav-text">
+            <strong>Bird Whisperer</strong>
+            <small>Audio & Visual ID</small>
+          </span>
+        </button>
+        <button class="nav-tab" data-tab="plant" onclick="switchTab('plant')">
+          <span class="nav-icon">🍄</span>
+          <span class="nav-text">
+            <strong>Plant Spotter</strong>
+            <small>Botany & Safe Foraging</small>
+          </span>
+        </button>
+        <button class="nav-tab" data-tab="garden" onclick="switchTab('garden')">
+          <span class="nav-icon">🌱</span>
+          <span class="nav-text">
+            <strong>Garden Oracle</strong>
+            <small>Seasonal Planner & Soil</small>
+          </span>
+        </button>
+        <button class="nav-tab" data-tab="trail" onclick="switchTab('trail')">
+          <span class="nav-icon">🥾</span>
+          <span class="nav-text">
+            <strong>Trail Finder</strong>
+            <small>Custom Adventures</small>
+          </span>
+        </button>
+        <button class="nav-tab" data-tab="timing" onclick="switchTab('timing')">
+          <span class="nav-icon">🌤️</span>
+          <span class="nav-text">
+            <strong>Outdoor Timing</strong>
+            <small>Golden Hours & Sky</small>
+          </span>
+        </button>
+        <button class="nav-tab" data-tab="ask" onclick="switchTab('ask')">
+          <span class="nav-icon">🤔</span>
+          <span class="nav-text">
+            <strong>Ask Nature</strong>
+            <small>Naturalist AI Q&A</small>
+          </span>
+        </button>
+      </nav>
     </div>
   </header>
 
-  <!-- Main app -->
-  <main class="app-shell">
+  <!-- Main Content Shell -->
+  <main class="main-workspace">
 
-    <!-- ── Tab: Bird ID ──────────────────────────────────── -->
-    <section class="tab active" id="tab-bird">
-      <div class="tab-header">
-        <span class="tab-icon">🐦</span>
+    <!-- ── TAB 1: BIRD WHISPERER ──────────────────────────────────────── -->
+    <section class="tab-pane active" id="pane-bird">
+      <div class="pane-intro">
+        <div class="intro-icon">🐦</div>
         <div>
           <h2>Bird Whisperer</h2>
-          <p>Describe what you see or hear — no image needed. Works offline on the trail.</p>
+          <p>Describe plumage, behavior, or song phonetics. Works deep in the backcountry without cell reception.</p>
         </div>
       </div>
 
-      <div class="form-card">
-        <div class="field">
-          <label for="birdDesc">What did you observe?</label>
-          <textarea id="birdDesc" rows="3"
-            placeholder="e.g. Small bird, bright yellow belly, black cap, white cheeks, making a 'chickadee-dee-dee' call in a pine tree..."></textarea>
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="birdLocation">Your location <span class="opt">(optional)</span></label>
-            <input id="birdLocation" type="text" placeholder="e.g. Pacific Northwest, USA" />
-          </div>
-          <div class="field">
-            <label for="birdSeason">Season <span class="opt">(optional)</span></label>
-            <select id="birdSeason">
-              <option value="">Auto-detect</option>
-              <option value="spring">Spring</option>
-              <option value="summer">Summer</option>
-              <option value="fall">Fall / Autumn</option>
-              <option value="winter">Winter</option>
-            </select>
-          </div>
-        </div>
-        <div class="quick-examples">
-          <span class="ex-label">Try:</span>
-          <button class="ex-chip" onclick="fillBirdExample('red breast, dark back, worm in beak, suburban lawn, hopping around')">Robin</button>
-          <button class="ex-chip" onclick="fillBirdExample('bright red all over, pointed crest, female at feeder, sunflower seeds')">Cardinal</button>
-          <button class="ex-chip" onclick="fillBirdExample('large black bird, wedge tail, very loud cawing, intelligent-looking, follows groups')">Corvid?</button>
-          <button class="ex-chip" onclick="fillBirdExample('tiny hummingbird-like, hovering at flowers, green back, no visible beak hovering')">Mystery</button>
-        </div>
-        <button class="cta-btn" id="birdBtn" onclick="identifyBird()">
-          <span class="btn-icon">🔍</span> Identify Bird
-        </button>
-      </div>
+      <div class="card-grid">
+        <div class="input-card">
+          <form onsubmit="identifyBird(event)">
+            <div class="form-group">
+              <label for="birdDesc">What did you see or hear? <span class="required">*</span></label>
+              <textarea id="birdDesc" rows="4" placeholder="e.g. Small energetic songbird with slate-gray cap, rusty flanks, bright yellow crown, repeating rapid 'swee-swee-chur' in birch branches..." required></textarea>
+            </div>
 
-      <div id="birdResult" class="result-card hidden"></div>
+            <div class="presets-row">
+              <span class="presets-label">Examples:</span>
+              <button type="button" class="preset-chip" onclick="fillInput('birdDesc', 'Bright red bird with black mask, prominent crest, loud whistling cheer-cheer-cheer call perched on pine')">Cardinal</button>
+              <button type="button" class="preset-chip" onclick="fillInput('birdDesc', 'Dark raptor gliding in high V-shape dihedral, red bare head, tipping wings back and forth in wind')">Turkey Vulture</button>
+              <button type="button" class="preset-chip" onclick="fillInput('birdDesc', 'Tiny yellow-green warbler flitting constantly in spruce tips, two white wingbars, thin needle beak')">Warbler</button>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="birdLoc">Location / Region</label>
+                <input type="text" id="birdLoc" placeholder="e.g. Pacific Northwest, Blue Ridge, Denver" />
+              </div>
+              <div class="form-group half">
+                <label for="birdSeason">Season / Month</label>
+                <select id="birdSeason">
+                  <option value="">Auto (Current Month)</option>
+                  <option value="Spring (Migration)">Spring (Migration)</option>
+                  <option value="Summer (Nesting)">Summer (Nesting)</option>
+                  <option value="Autumn (Fall Migration)">Autumn (Fall Migration)</option>
+                  <option value="Winter (Overwintering)">Winter (Overwintering)</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="cta-btn" id="btnBirdSubmit">
+              <span class="cta-icon">🔍</span> Identify Bird with Local AI
+            </button>
+          </form>
+        </div>
+
+        <div class="output-card" id="birdResult">
+          <div class="empty-state">
+            <span class="empty-icon">🪶</span>
+            <h3>No bird identified yet</h3>
+            <p>Input field observations on the left or select a sample preset to run local inference.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- ── Tab: Garden ──────────────────────────────────── -->
-    <section class="tab" id="tab-garden">
-      <div class="tab-header">
-        <span class="tab-icon">🌱</span>
+    <!-- ── TAB 2: PLANT SPOTTER ───────────────────────────────────────── -->
+    <section class="tab-pane" id="pane-plant">
+      <div class="pane-intro">
+        <div class="intro-icon">🍄</div>
+        <div>
+          <h2>Plant & Foraging Spotter</h2>
+          <p>Botanical identification keys and rigorous safety cross-checks. Always inspect lethal look-alikes before foraging.</p>
+        </div>
+      </div>
+
+      <div class="card-grid">
+        <div class="input-card">
+          <form onsubmit="identifyPlant(event)">
+            <div class="form-group">
+              <label for="plantDesc">Plant / Mushroom Characteristics <span class="required">*</span></label>
+              <textarea id="plantDesc" rows="4" placeholder="e.g. Cluster of golden-yellow funnel-shaped mushrooms growing from mossy soil near oak root, false gills running down stem, smelling faintly of apricots..." required></textarea>
+            </div>
+
+            <div class="presets-row">
+              <span class="presets-label">Examples:</span>
+              <button type="button" class="preset-chip" onclick="fillInput('plantDesc', 'Stem has three leaflets, middle on longer petiole, shiny reddish-green edges, growing as low vine near trail')">Poison Ivy test</button>
+              <button type="button" class="preset-chip" onclick="fillInput('plantDesc', 'Vibrant orange mushroom fruiting in tiered brackets directly on fallen oak log, sulfur yellow underside with fine pores, no gills')">Chicken of Woods</button>
+              <button type="button" class="preset-chip" onclick="fillInput('plantDesc', 'Heart-shaped deeply veined leaves with stinging trichome hairs, square stem, green tassel flowers')">Stinging Nettle</button>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="plantLoc">Environment / Habitat</label>
+                <input type="text" id="plantLoc" placeholder="e.g. Damp temperate forest floor, open meadow, stream bank" />
+              </div>
+              <div class="form-group half">
+                <label for="plantGoal">Primary Intention</label>
+                <select id="plantGoal">
+                  <option value="Identification & Ecology">Identification & Ecology</option>
+                  <option value="Safe Foraging / Edibility Check">Safe Foraging / Edibility Check</option>
+                  <option value="Hazard / Toxicity Warning">Hazard / Toxicity Warning</option>
+                  <option value="Medicinal & Traditional Use">Medicinal & Traditional Use</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="cta-btn btn-plant" id="btnPlantSubmit">
+              <span class="cta-icon">🌿</span> Analyze Botanical Characteristics
+            </button>
+          </form>
+        </div>
+
+        <div class="output-card" id="plantResult">
+          <div class="empty-state">
+            <span class="empty-icon">🍃</span>
+            <h3>Botanical analysis ready</h3>
+            <p>Describe leaves, stems, gills, bark, or flowers to receive botanical keys and hazard ratings.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── TAB 3: GARDEN ORACLE ───────────────────────────────────────── -->
+    <section class="tab-pane" id="pane-garden">
+      <div class="pane-intro">
+        <div class="intro-icon">🌱</div>
         <div>
           <h2>Garden Oracle</h2>
-          <p>What should you plant this week? Based on your local frost dates and USDA zone.</p>
+          <p>Regional horticultural calendar, companion planting tips, and weekly soil prescriptions calibrated to your zone.</p>
         </div>
       </div>
 
-      <div class="form-card">
-        <div class="field-row">
-          <div class="field">
-            <label for="gardenLocation">Your region / city</label>
-            <input id="gardenLocation" type="text" placeholder="e.g. Denver, Colorado" />
-          </div>
-          <div class="field">
-            <label for="gardenZone">USDA Zone <span class="opt">(optional)</span></label>
-            <input id="gardenZone" type="text" placeholder="e.g. 6b" />
-          </div>
-        </div>
-        <div class="quick-examples">
-          <span class="ex-label">Try:</span>
-          <button class="ex-chip" onclick="fillGardenExample('Portland, Oregon', '8b')">Portland OR</button>
-          <button class="ex-chip" onclick="fillGardenExample('Chicago, Illinois', '5b')">Chicago IL</button>
-          <button class="ex-chip" onclick="fillGardenExample('Austin, Texas', '8b')">Austin TX</button>
-          <button class="ex-chip" onclick="fillGardenExample('Boston, Massachusetts', '6a')">Boston MA</button>
-        </div>
-        <button class="cta-btn" id="gardenBtn" onclick="planGarden()">
-          <span class="btn-icon">🌻</span> Get This Week's Plan
-        </button>
-      </div>
+      <div class="card-grid">
+        <div class="input-card">
+          <form onsubmit="planGarden(event)">
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="gardenLoc">Location / City <span class="required">*</span></label>
+                <input type="text" id="gardenLoc" placeholder="e.g. Austin TX, Seattle WA, London UK" required />
+              </div>
+              <div class="form-group half">
+                <label for="gardenZone">USDA Hardiness Zone</label>
+                <select id="gardenZone">
+                  <option value="">Estimate from Location</option>
+                  <option value="Zone 3 (-40 to -30°F)">Zone 3</option>
+                  <option value="Zone 4 (-30 to -20°F)">Zone 4</option>
+                  <option value="Zone 5 (-20 to -10°F)">Zone 5</option>
+                  <option value="Zone 6 (-10 to 0°F)">Zone 6</option>
+                  <option value="Zone 7 (0 to 10°F)">Zone 7</option>
+                  <option value="Zone 8 (10 to 20°F)">Zone 8</option>
+                  <option value="Zone 9 (20 to 30°F)">Zone 9</option>
+                  <option value="Zone 10 (30 to 40°F)">Zone 10</option>
+                </select>
+              </div>
+            </div>
 
-      <div id="gardenResult" class="result-card hidden"></div>
+            <div class="form-group">
+              <label for="gardenMonth">Planning Month</label>
+              <select id="gardenMonth">
+                <option value="">Current Month (Auto)</option>
+                <option value="January">January</option>
+                <option value="February">February</option>
+                <option value="March">March</option>
+                <option value="April">April</option>
+                <option value="May">May</option>
+                <option value="June">June</option>
+                <option value="July">July</option>
+                <option value="August">August</option>
+                <option value="September">September</option>
+                <option value="October">October</option>
+                <option value="November">November</option>
+                <option value="December">December</option>
+              </select>
+            </div>
+
+            <div class="presets-row">
+              <span class="presets-label">Quick Places:</span>
+              <button type="button" class="preset-chip" onclick="fillInput('gardenLoc', 'Pacific Northwest, Portland')">Portland (Zone 8b)</button>
+              <button type="button" class="preset-chip" onclick="fillInput('gardenLoc', 'Appalachia, Asheville NC')">Asheville (Zone 7a)</button>
+              <button type="button" class="preset-chip" onclick="fillInput('gardenLoc', 'Great Lakes, Chicago IL')">Chicago (Zone 6a)</button>
+            </div>
+
+            <button type="submit" class="cta-btn btn-garden" id="btnGardenSubmit">
+              <span class="cta-icon">🚜</span> Consult Garden Oracle
+            </button>
+          </form>
+        </div>
+
+        <div class="output-card" id="gardenResult">
+          <div class="empty-state">
+            <span class="empty-icon">🪴</span>
+            <h3>No garden plan generated</h3>
+            <p>Tell us your region to generate planting dates, weekly soil prep, and pest watches.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- ── Tab: Trails ──────────────────────────────────── -->
-    <section class="tab" id="tab-trail">
-      <div class="tab-header">
-        <span class="tab-icon">🥾</span>
+    <!-- ── TAB 4: TRAIL FINDER ────────────────────────────────────────── -->
+    <section class="tab-pane" id="pane-trail">
+      <div class="pane-intro">
+        <div class="intro-icon">🥾</div>
         <div>
-          <h2>Trail Finder</h2>
-          <p>Find the best hike for the season near you. Fall foliage? Spring wildflowers? We've got you.</p>
+          <h2>Trail Finder & Trek Planner</h2>
+          <p>Curated route profiles, elevation warnings, seasonal gear manifests, and Leave-No-Trace trail ethics.</p>
         </div>
       </div>
 
-      <div class="form-card">
-        <div class="field">
-          <label for="trailLocation">Where are you?</label>
-          <input id="trailLocation" type="text" placeholder="e.g. Asheville, North Carolina" />
-        </div>
-        <div class="field-row">
-          <div class="field">
-            <label for="trailDifficulty">Difficulty</label>
-            <select id="trailDifficulty">
-              <option value="any">Any level</option>
-              <option value="easy">Easy (family-friendly)</option>
-              <option value="moderate">Moderate</option>
-              <option value="hard">Challenging</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="trailDuration">Time available</label>
-            <select id="trailDuration">
-              <option value="1-2 hours">1–2 hours</option>
-              <option value="half day" selected>Half day</option>
-              <option value="full day">Full day</option>
-              <option value="overnight">Overnight</option>
-            </select>
-          </div>
-        </div>
-        <div class="field">
-          <label for="trailInterest">Special interest <span class="opt">(optional)</span></label>
-          <input id="trailInterest" type="text" placeholder="e.g. fall foliage, waterfalls, birding, sunrise views..." />
-        </div>
-        <button class="cta-btn" id="trailBtn" onclick="findTrails()">
-          <span class="btn-icon">🗺️</span> Find My Trail
-        </button>
-      </div>
+      <div class="card-grid">
+        <div class="input-card">
+          <form onsubmit="findTrails(event)">
+            <div class="form-group">
+              <label for="trailLoc">Hiking Destination or Area <span class="required">*</span></label>
+              <input type="text" id="trailLoc" placeholder="e.g. Olympic Peninsula WA, Shenandoah VA, Boulder CO" required />
+            </div>
 
-      <div id="trailResult" class="result-card hidden"></div>
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="trailDiff">Difficulty Level</label>
+                <select id="trailDiff">
+                  <option value="any difficulty">Any Difficulty</option>
+                  <option value="easy family-friendly flat">Easy / Stroll (Gentle grade)</option>
+                  <option value="moderate undulating scenic">Moderate (Some climbs)</option>
+                  <option value="hard strenuous high elevation">Strenuous / Alpine (Technical)</option>
+                </select>
+              </div>
+              <div class="form-group half">
+                <label for="trailDuration">Time Available</label>
+                <select id="trailDuration">
+                  <option value="1-2 hours short trip">1 – 2 hours (Quick trip)</option>
+                  <option value="half-day 3-5 hours">Half-day (3 – 5 hours)</option>
+                  <option value="full day excursion">Full day trek</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="trailInterest">Scenic Highlights / Priority</label>
+              <input type="text" id="trailInterest" placeholder="e.g. Waterfalls, ancient old growth, panoramic ridges, birdwatching" />
+            </div>
+
+            <div class="presets-row">
+              <span class="presets-label">Popular spots:</span>
+              <button type="button" class="preset-chip" onclick="fillInput('trailLoc', 'White Mountains, New Hampshire')">White Mountains</button>
+              <button type="button" class="preset-chip" onclick="fillInput('trailLoc', 'Mount Rainier, Paradise trails')">Mt. Rainier</button>
+              <button type="button" class="preset-chip" onclick="fillInput('trailLoc', 'Marin Headlands & Coastal Trail, California')">Marin Coast</button>
+            </div>
+
+            <button type="submit" class="cta-btn btn-trail" id="btnTrailSubmit">
+              <span class="cta-icon">🧭</span> Discover Custom Trails
+            </button>
+          </form>
+        </div>
+
+        <div class="output-card" id="trailResult">
+          <div class="empty-state">
+            <span class="empty-icon">🏔️</span>
+            <h3>Explore the backcountry</h3>
+            <p>Select your region and fitness preferences to generate targeted route intelligence.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
-    <!-- ── Tab: Ask ──────────────────────────────────── -->
-    <section class="tab" id="tab-ask">
-      <div class="tab-header">
-        <span class="tab-icon">🤔</span>
+    <!-- ── TAB 5: OUTDOOR TIMING ──────────────────────────────────────── -->
+    <section class="tab-pane" id="pane-timing">
+      <div class="pane-intro">
+        <div class="intro-icon">🌤️</div>
         <div>
-          <h2>Ask Nature</h2>
-          <p>Free-form questions about the outdoors. Foraging, stargazing, wildlife, weather — anything.</p>
+          <h2>Outdoor Timing & Phenology</h2>
+          <p>Find the golden hour window, peak wildlife activity hours, astronomical passes, and 10-minute micro challenges.</p>
         </div>
       </div>
 
-      <div class="form-card">
-        <div class="field">
-          <label for="askQuestion">Your question</label>
-          <textarea id="askQuestion" rows="3"
-            placeholder="e.g. What are some edible mushrooms I can safely forage in the northeast? How do I identify poison ivy? Best time to see meteor showers this fall?"></textarea>
+      <div class="card-grid">
+        <div class="input-card">
+          <form onsubmit="calculateTiming(event)">
+            <div class="form-group">
+              <label for="timingLoc">Your Location / Climate Zone <span class="required">*</span></label>
+              <input type="text" id="timingLoc" placeholder="e.g. Minneapolis, Toronto, Northern California" required />
+            </div>
+
+            <div class="form-row">
+              <div class="form-group half">
+                <label for="timingActivity">Planned Activity</label>
+                <select id="timingActivity">
+                  <option value="General Touch Grass walk & mindfulness">Mindful Walk / Touch Grass</option>
+                  <option value="Golden Hour landscape photography">Golden Hour Photography</option>
+                  <option value="Early morning songbird listening">Bird Chorus & Wildlife Spotting</option>
+                  <option value="Night sky stargazing & astrophotography">Night Sky & Stargazing</option>
+                  <option value="Trail running or fitness hike">Trail Running / Cardio</option>
+                </select>
+              </div>
+              <div class="form-group half">
+                <label for="timingHemisphere">Hemisphere</label>
+                <select id="timingHemisphere">
+                  <option value="Northern Hemisphere">Northern Hemisphere</option>
+                  <option value="Southern Hemisphere">Southern Hemisphere</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="presets-row">
+              <span class="presets-label">Fast Presets:</span>
+              <button type="button" class="preset-chip" onclick="fillInput('timingLoc', 'Northern Rockies, Montana')">Montana Rockies</button>
+              <button type="button" class="preset-chip" onclick="fillInput('timingLoc', 'Hudson Valley, New York')">Hudson Valley</button>
+              <button type="button" class="preset-chip" onclick="fillInput('timingLoc', 'Sonoran Desert, Arizona')">Arizona Desert</button>
+            </div>
+
+            <button type="submit" class="cta-btn btn-timing" id="btnTimingSubmit">
+              <span class="cta-icon">⏳</span> Calculate Best Nature Window
+            </button>
+          </form>
         </div>
-        <div class="quick-examples">
-          <span class="ex-label">Try:</span>
-          <button class="ex-chip" onclick="fillAskExample('What are the best edible wild plants to forage safely in fall?')">🍄 Foraging</button>
-          <button class="ex-chip" onclick="fillAskExample('How do I identify constellations with the naked eye this month?')">⭐ Stargazing</button>
-          <button class="ex-chip" onclick="fillAskExample('What should I pack for a 5-mile day hike in cold weather?')">🎒 Gear</button>
-          <button class="ex-chip" onclick="fillAskExample('How do I find deer tracks and read animal signs on a trail?')">🦌 Tracking</button>
+
+        <div class="output-card" id="timingResult">
+          <div class="empty-state">
+            <span class="empty-icon">☀️</span>
+            <h3>Optimal time calculation</h3>
+            <p>Tell us where you are and what you want to experience outside today.</p>
+          </div>
         </div>
-        <button class="cta-btn" id="askBtn" onclick="askNature()">
-          <span class="btn-icon">💬</span> Ask GrassWhisperer
-        </button>
+      </div>
+    </section>
+
+    <!-- ── TAB 6: ASK NATURE ──────────────────────────────────────────── -->
+    <section class="tab-pane" id="pane-ask">
+      <div class="pane-intro">
+        <div class="intro-icon">🤔</div>
+        <div>
+          <h2>Ask Nature Naturalist AI</h2>
+          <p>Conversational field master. Ask anything about wilderness survival, geology, tracking animal spoor, or weather lore.</p>
+        </div>
       </div>
 
-      <!-- Chat history -->
-      <div id="askHistory" class="chat-history"></div>
+      <div class="card-grid">
+        <div class="input-card">
+          <form onsubmit="askNature(event)">
+            <div class="form-group">
+              <label for="askQuestion">Ask your outdoor question <span class="required">*</span></label>
+              <textarea id="askQuestion" rows="4" placeholder="e.g. How can I read barometric pressure changes by watching cloud formations? Or: How do I tell deer tracks from elk tracks?" required></textarea>
+            </div>
+
+            <div class="presets-row">
+              <span class="presets-label">Inspirations:</span>
+              <button type="button" class="preset-chip" onclick="fillInput('askQuestion', 'Why do morning birds sing so loudly in spring and what is the dawn chorus order?')">Dawn Chorus</button>
+              <button type="button" class="preset-chip" onclick="fillInput('askQuestion', 'What are 3 foolproof ways to find North without a compass or phone in the woods?')">Navigation</button>
+              <button type="button" class="preset-chip" onclick="fillInput('askQuestion', 'How do trees communicate and share carbon through underground mycorrhizal networks?')">Wood Wide Web</button>
+            </div>
+
+            <div class="form-group">
+              <label for="askContext">Optional Context (Location, Environment)</label>
+              <input type="text" id="askContext" placeholder="e.g. Walking in dense deciduous woods after rainfall" />
+            </div>
+
+            <button type="submit" class="cta-btn btn-ask" id="btnAskSubmit">
+              <span class="cta-icon">💬</span> Ask Field Naturalist
+            </button>
+          </form>
+        </div>
+
+        <div class="output-card" id="askResult">
+          <div class="empty-state">
+            <span class="empty-icon">🌲</span>
+            <h3>Nature query pending</h3>
+            <p>Ask a question about tracking, outdoor safety, bird ecology, weather signs, or wild botany.</p>
+          </div>
+        </div>
+      </div>
     </section>
 
   </main>
 
+  <!-- ── SETTINGS DRAWER ──────────────────────────────────────────────── -->
+  <div class="drawer-overlay" id="settingsOverlay" onclick="toggleSettings(false)"></div>
+  <aside class="drawer" id="settingsDrawer" role="dialog" aria-label="Engine Settings">
+    <div class="drawer-header">
+      <h3>⚙️ Engine Configuration</h3>
+      <button class="close-btn" onclick="toggleSettings(false)">✕</button>
+    </div>
+    <div class="drawer-body">
+      <div class="settings-section">
+        <h4>Local Ollama Model</h4>
+        <p class="settings-help">Select the active open-weight model serving on your machine.</p>
+        <select id="modelSelect" onchange="changeModel(this.value)">
+          <option value="llama3.2:1b">llama3.2:1b (Fast · Lightweight)</option>
+          <option value="llama3.2:3b">llama3.2:3b (Balanced · Recommended)</option>
+          <option value="llama3.1:8b">llama3.1:8b (High Detail)</option>
+          <option value="mistral:7b">mistral:7b</option>
+          <option value="phi3:mini">phi3:mini</option>
+        </select>
+        <button class="action-btn small" onclick="refreshModels()">🔄 Refresh Model List</button>
+      </div>
+
+      <div class="settings-section">
+        <h4>Connection Endpoint</h4>
+        <p class="settings-help">Default is standard local daemon port.</p>
+        <input type="text" id="endpointUrl" value="http://localhost:11434" readonly />
+        <span class="tag">Local Loopback Only</span>
+      </div>
+
+      <div class="settings-section">
+        <h4>Audio Readout (Speech)</h4>
+        <label class="toggle-row">
+          <span>Enable Web Speech synthesizer for bird songs & tips</span>
+          <input type="checkbox" id="ttsToggle" checked />
+        </label>
+      </div>
+
+      <div class="settings-section">
+        <h4>Offline Guarantee</h4>
+        <div class="guarantee-box">
+          <p>✅ Zero remote API telemetry</p>
+          <p>✅ Zero analytics trackers</p>
+          <p>✅ Weights reside on your local storage</p>
+          <p>✅ Air-gapped field capable</p>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ── FIELD JOURNAL DRAWER ─────────────────────────────────────────── -->
+  <div class="drawer-overlay" id="journalOverlay" onclick="toggleJournal(false)"></div>
+  <aside class="drawer" id="journalDrawer" role="dialog" aria-label="Field Journal">
+    <div class="drawer-header">
+      <h3>📖 Offline Field Journal</h3>
+      <button class="close-btn" onclick="toggleJournal(false)">✕</button>
+    </div>
+    <div class="drawer-toolbar">
+      <button class="action-btn small" onclick="exportJournalMarkdown()">📥 Export Markdown</button>
+      <button class="action-btn small danger" onclick="clearJournal()">🗑️ Clear All</button>
+    </div>
+    <div class="drawer-body" id="journalItemsList">
+      <div class="empty-state small">
+        <p>No saved entries yet. Click "Save to Journal" on any observation result.</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Toast Notification Hub -->
+  <div class="toast-hub" id="toastHub" aria-live="polite"></div>
+
   <!-- Footer -->
-  <footer class="footer">
+  <footer class="app-footer">
     <div class="footer-inner">
-      <div class="footer-badge">
-        <span>⚡</span>
-        <div>
-          <strong>100% Open Source</strong>
-          <span>Ollama + llama3.2:1b — runs on a MacBook Air, a Linux box, or a $200 laptop</span>
-        </div>
-      </div>
-      <div class="footer-badge">
-        <span>🔒</span>
-        <div>
-          <strong>Zero Data Collection</strong>
-          <span>Your questions never leave your machine. No logs, no servers, no accounts.</span>
-        </div>
-      </div>
-      <div class="footer-badge">
-        <span>🌿</span>
-        <div>
-          <strong>Hacktoberfest 2024</strong>
-          <span>Challenge 1: Touch Grass — Built with open-source AI</span>
-        </div>
-      </div>
+      <p><strong>GrassWhisperer 🌿</strong> — Built for Hacktoberfest 2026: <em>Touch Grass Challenge</em>.</p>
+      <p class="footer-links">
+        <a href="https://github.com/PawanTheGod/grasswhisperer" target="_blank">GitHub Repository</a> ·
+        <a href="https://ollama.com" target="_blank">Ollama Open-Source AI</a> ·
+        <a href="https://dev.to/challenges/hacktoberfest-week1-2026-10-05" target="_blank">Dev.to Challenge</a>
+      </p>
+      <p class="footer-motto">Put down the phone. Lace up your boots. Listen to the wind.</p>
     </div>
   </footer>
 
