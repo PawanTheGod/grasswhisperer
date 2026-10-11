@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GrassWhisperer 🌿 — Local AI Outdoor Companion</title>
+  <meta name="description" content="Your offline-first AI companion for birding, gardening, hiking, and getting outside. Powered by open-source Ollama — no cloud, no tracking." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Fraunces:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Ambient background particles -->
+  <div class="ambient" id="ambient"></div>
+
+  <!-- Status bar -->
+  <div class="status-bar" id="statusBar">
+    <div class="status-dot" id="statusDot"></div>
+    <span id="statusText">Connecting to Ollama...</span>
+    <span class="status-badge">100% Local · No Cloud</span>
+  </div>
+
+  <!-- Hero -->
+  <header class="hero">
+    <div class="hero-inner">
+      <div class="logo-wrap">
+        <div class="logo-icon">🌿</div>
+        <div>
+          <h1 class="logo-title">GrassWhisperer</h1>
+          <p class="logo-sub">Open-source AI · Runs on your laptop · No internet needed</p>
+        </div>
+      </div>
+      <p class="hero-tagline">
+        Your trail-ready AI companion — identify birds, plan your garden, find the perfect hike.<br />
+        <em>Powered by <a href="https://ollama.com" target="_blank">Ollama</a> + llama3.2 — your data never leaves your device.</em>
+      </p>
+      <div class="hero-pills">
+        <span class="pill" onclick="showTab('bird')">🐦 Bird ID</span>
+        <span class="pill" onclick="showTab('garden')">🌱 Garden</span>
+        <span class="pill" onclick="showTab('trail')">🥾 Trails</span>
+        <span class="pill" onclick="showTab('ask')">🤔 Ask Nature</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main app -->
+  <main class="app-shell">
+
+    <!-- ── Tab: Bird ID ──────────────────────────────────── -->
+    <section class="tab active" id="tab-bird">
+      <div class="tab-header">
+        <span class="tab-icon">🐦</span>
+        <div>
+          <h2>Bird Whisperer</h2>
+          <p>Describe what you see or hear — no image needed. Works offline on the trail.</p>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="field">
+          <label for="birdDesc">What did you observe?</label>
+          <textarea id="birdDesc" rows="3"
+            placeholder="e.g. Small bird, bright yellow belly, black cap, white cheeks, making a 'chickadee-dee-dee' call in a pine tree..."></textarea>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="birdLocation">Your location <span class="opt">(optional)</span></label>
+            <input id="birdLocation" type="text" placeholder="e.g. Pacific Northwest, USA" />
+          </div>
+          <div class="field">
+            <label for="birdSeason">Season <span class="opt">(optional)</span></label>
+            <select id="birdSeason">
+              <option value="">Auto-detect</option>
+              <option value="spring">Spring</option>
+              <option value="summer">Summer</option>
+              <option value="fall">Fall / Autumn</option>
+              <option value="winter">Winter</option>
+            </select>
+          </div>
+        </div>
+        <div class="quick-examples">
+          <span class="ex-label">Try:</span>
+          <button class="ex-chip" onclick="fillBirdExample('red breast, dark back, worm in beak, suburban lawn, hopping around')">Robin</button>
+          <button class="ex-chip" onclick="fillBirdExample('bright red all over, pointed crest, female at feeder, sunflower seeds')">Cardinal</button>
+          <button class="ex-chip" onclick="fillBirdExample('large black bird, wedge tail, very loud cawing, intelligent-looking, follows groups')">Corvid?</button>
+          <button class="ex-chip" onclick="fillBirdExample('tiny hummingbird-like, hovering at flowers, green back, no visible beak hovering')">Mystery</button>
+        </div>
+        <button class="cta-btn" id="birdBtn" onclick="identifyBird()">
+          <span class="btn-icon">🔍</span> Identify Bird
+        </button>
+      </div>
+
+      <div id="birdResult" class="result-card hidden"></div>
+    </section>
+
+    <!-- ── Tab: Garden ──────────────────────────────────── -->
+    <section class="tab" id="tab-garden">
+      <div class="tab-header">
+        <span class="tab-icon">🌱</span>
+        <div>
+          <h2>Garden Oracle</h2>
+          <p>What should you plant this week? Based on your local frost dates and USDA zone.</p>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="field-row">
+          <div class="field">
+            <label for="gardenLocation">Your region / city</label>
+            <input id="gardenLocation" type="text" placeholder="e.g. Denver, Colorado" />
+          </div>
+          <div class="field">
+            <label for="gardenZone">USDA Zone <span class="opt">(optional)</span></label>
+            <input id="gardenZone" type="text" placeholder="e.g. 6b" />
+          </div>
+        </div>
+        <div class="quick-examples">
+          <span class="ex-label">Try:</span>
+          <button class="ex-chip" onclick="fillGardenExample('Portland, Oregon', '8b')">Portland OR</button>
+          <button class="ex-chip" onclick="fillGardenExample('Chicago, Illinois', '5b')">Chicago IL</button>
+          <button class="ex-chip" onclick="fillGardenExample('Austin, Texas', '8b')">Austin TX</button>
+          <button class="ex-chip" onclick="fillGardenExample('Boston, Massachusetts', '6a')">Boston MA</button>
+        </div>
+        <button class="cta-btn" id="gardenBtn" onclick="planGarden()">
+          <span class="btn-icon">🌻</span> Get This Week's Plan
+        </button>
+      </div>
+
+      <div id="gardenResult" class="result-card hidden"></div>
+    </section>
+
+    <!-- ── Tab: Trails ──────────────────────────────────── -->
+    <section class="tab" id="tab-trail">
+      <div class="tab-header">
+        <span class="tab-icon">🥾</span>
+        <div>
+          <h2>Trail Finder</h2>
+          <p>Find the best hike for the season near you. Fall foliage? Spring wildflowers? We've got you.</p>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="field">
+          <label for="trailLocation">Where are you?</label>
+          <input id="trailLocation" type="text" placeholder="e.g. Asheville, North Carolina" />
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label for="trailDifficulty">Difficulty</label>
+            <select id="trailDifficulty">
+              <option value="any">Any level</option>
+              <option value="easy">Easy (family-friendly)</option>
+              <option value="moderate">Moderate</option>
+              <option value="hard">Challenging</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="trailDuration">Time available</label>
+            <select id="trailDuration">
+              <option value="1-2 hours">1–2 hours</option>
+              <option value="half day" selected>Half day</option>
+              <option value="full day">Full day</option>
+              <option value="overnight">Overnight</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label for="trailInterest">Special interest <span class="opt">(optional)</span></label>
+          <input id="trailInterest" type="text" placeholder="e.g. fall foliage, waterfalls, birding, sunrise views..." />
+        </div>
+        <button class="cta-btn" id="trailBtn" onclick="findTrails()">
+          <span class="btn-icon">🗺️</span> Find My Trail
+        </button>
+      </div>
+
+      <div id="trailResult" class="result-card hidden"></div>
+    </section>
+
+    <!-- ── Tab: Ask ──────────────────────────────────── -->
+    <section class="tab" id="tab-ask">
+      <div class="tab-header">
+        <span class="tab-icon">🤔</span>
+        <div>
+          <h2>Ask Nature</h2>
+          <p>Free-form questions about the outdoors. Foraging, stargazing, wildlife, weather — anything.</p>
+        </div>
+      </div>
+
+      <div class="form-card">
+        <div class="field">
+          <label for="askQuestion">Your question</label>
+          <textarea id="askQuestion" rows="3"
+            placeholder="e.g. What are some edible mushrooms I can safely forage in the northeast? How do I identify poison ivy? Best time to see meteor showers this fall?"></textarea>
+        </div>
+        <div class="quick-examples">
+          <span class="ex-label">Try:</span>
+          <button class="ex-chip" onclick="fillAskExample('What are the best edible wild plants to forage safely in fall?')">🍄 Foraging</button>
+          <button class="ex-chip" onclick="fillAskExample('How do I identify constellations with the naked eye this month?')">⭐ Stargazing</button>
+          <button class="ex-chip" onclick="fillAskExample('What should I pack for a 5-mile day hike in cold weather?')">🎒 Gear</button>
+          <button class="ex-chip" onclick="fillAskExample('How do I find deer tracks and read animal signs on a trail?')">🦌 Tracking</button>
+        </div>
+        <button class="cta-btn" id="askBtn" onclick="askNature()">
+          <span class="btn-icon">💬</span> Ask GrassWhisperer
+        </button>
+      </div>
+
+      <!-- Chat history -->
+      <div id="askHistory" class="chat-history"></div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-badge">
+        <span>⚡</span>
+        <div>
+          <strong>100% Open Source</strong>
+          <span>Ollama + llama3.2:1b — runs on a MacBook Air, a Linux box, or a $200 laptop</span>
+        </div>
+      </div>
+      <div class="footer-badge">
+        <span>🔒</span>
+        <div>
+          <strong>Zero Data Collection</strong>
+          <span>Your questions never leave your machine. No logs, no servers, no accounts.</span>
+        </div>
+      </div>
+      <div class="footer-badge">
+        <span>🌿</span>
+        <div>
+          <strong>Hacktoberfest 2024</strong>
+          <span>Challenge 1: Touch Grass — Built with open-source AI</span>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,15 @@
+{
+  "name": "grasswhisperer",
+  "version": "1.0.0",
+  "description": "Local AI outdoor companion - Touch Grass challenge",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "setup": "node setup.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
